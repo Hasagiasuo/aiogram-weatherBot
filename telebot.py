@@ -49,7 +49,7 @@ class Admin(StatesGroup):
 class Rename(StatesGroup):
   new_city = State()
 
-@dp.message_handler(commands = 'Choice_my_city', state = None)
+@dp.message_handler(commands = 'Choose_my_city', state = None)
 async def get_all(message: types.Message):
   await Admin.ids.set()
   await message.answer("Enter u'r city:", reply_markup = kb_rem)
@@ -69,7 +69,7 @@ async def get_city(message: types.Message, state: FSMContext):
   await state.finish()
   await message.answer("U'r city been registr!", reply_markup = kb_reg)
 
-@dp.message_handler(commands = 'Rename_my_city', state = None)
+@dp.message_handler(commands = 'Change_my_city', state = None)
 async def get_all(message: types.Message):
   await Rename.new_city.set()
   await message.answer("Enter new city:", reply_markup = kb_rem)
@@ -89,14 +89,15 @@ async def rename_city(message: types.Message, state: FSMContext):
 
 @dp.message_handler(commands = 'start')
 async def start(message: types.Message):
-  cur.execute('SELECT ids FROM menu')
+  id_user = message.from_user.id
+  cur.execute(f'SELECT city FROM menu WHERE ids = "{id_user}"')
   if cur.fetchone() is None:
     await message.answer('Hello, welcome to the weather bot! Use the keyboard to control the bot!', reply_markup = kb)
   else:
     await message.answer('Hello, welcome to the weather bot! Use the keyboard to control the bot!', reply_markup = kb_reg)
 
 
-@dp.message_handler(commands = 'Get_weather')
+@dp.message_handler(commands = 'Get_the_weather')
 async def weather(message: types.Message):
   await message.answer('Enter city and i`ll resend u inforamtion!')
   @dp.message_handler()
@@ -129,7 +130,7 @@ async def weather(message: types.Message):
     except:
       await message.answer('\U0001F6AB Error! Cheack name city! \U0001F6AB')
 
-@dp.message_handler(commands = 'Cheak_into_my_city')
+@dp.message_handler(commands = 'Weather_in_my_city')
 async def into_city(message: types.Message):
   id_user = message.from_user.id
   cur.execute(f'SELECT city FROM menu WHERE ids = "{id_user}"')
@@ -174,11 +175,11 @@ async def quit(message: types.Message):
 kb = ReplyKeyboardMarkup(resize_keyboard = True)
 kb_reg = ReplyKeyboardMarkup(resize_keyboard = True)
 kb_rem = ReplyKeyboardRemove()
-b1 = KeyboardButton('/Get_weather')
-b2 = KeyboardButton('/Choice_my_city')
-b3 = KeyboardButton('/Cheak_into_my_city')
+b1 = KeyboardButton('/Get_the_weather')
+b2 = KeyboardButton('/Choose_my_city')
+b3 = KeyboardButton('/Weather_in_my_city')
 b4 = KeyboardButton('/Exit')
-b5 = KeyboardButton('/Rename_my_city')
+b5 = KeyboardButton('/Change_my_city')
 
 kb.add(b1).add(b2).add(b4)
 kb_reg.add(b1).row(b3, b5).add(b4)
