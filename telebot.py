@@ -46,17 +46,20 @@ class Admin(StatesGroup):
   ids = State()
   city = State()
 
+class Rename(StatesGroup):
+  new_city = State()
+
 @dp.message_handler(commands = 'Choice_my_city', state = None)
 async def get_all(message: types.Message):
   await Admin.ids.set()
-  await message.answer("Enter u'r city", reply_markup = kb_rem)
+  await message.answer("Enter u'r city:", reply_markup = kb_rem)
 
 @dp.message_handler(state = Admin.ids)
 async def get_id(message: types.Message, state = FSMContext):
   async with state.proxy() as data:
     data['id'] = message.from_user.id
   await Admin.next()
-  await message.answer("Enter u'r city again for confirmation")
+  await message.answer("Enter u'r city again for confirmation:")
 
 @dp.message_handler(state = Admin.city)
 async def get_city(message: types.Message, state: FSMContext):
@@ -65,7 +68,23 @@ async def get_city(message: types.Message, state: FSMContext):
   await add_info(state)
   await state.finish()
   await message.answer("U'r city been registr!", reply_markup = kb_reg)
+
+@dp.message_handler(commands = 'Rename_my_city', state = None)
+async def get_all(message: types.Message):
+  await Rename.new_city.set()
+  await message.answer("Enter new city:", reply_markup = kb_rem)
   
+@dp.message_handler(state = Rename.new_city)
+async def rename_city(message: types.Message, state: FSMContext):
+  async with state.proxy() as citys:
+    citys = message.text
+  id_user = message.from_user.id
+  cur.execute(f'UPDATE menu SET city = "{citys}" WHERE ids = "{id_user}"')
+  db.commit()
+  await state.finish()
+  await message.answer('Successful!', reply_markup = kb_reg)
+
+
 #statr
 
 @dp.message_handler(commands = 'start')
@@ -108,7 +127,7 @@ async def weather(message: types.Message):
         wd = 'Just look into window, i can`t know!'
       await message.answer(f'***{time_now}***\nSity: {message.text}\nTemp: {temp_sity} C° {wd}\nHumidity: {humidity}\nSunup: {sunup}\nSundown: {sundown}\nWind: {wind} m/s\n***Have a good day***')
     except:
-      await message.answer('\U00002620Error! Cheack name city!\U00002620')
+      await message.answer('\U0001F6AB Error! Cheack name city! \U0001F6AB')
 
 @dp.message_handler(commands = 'Cheak_into_my_city')
 async def into_city(message: types.Message):
@@ -141,7 +160,7 @@ async def into_city(message: types.Message):
         wd = 'Just look into window, i can`t know!'
       await message.answer(f'***{time_now}***\nSity: {city_user[0]}\nTemp: {temp_sity} C° {wd}\nHumidity: {humidity}\nSunup: {sunup}\nSundown: {sundown}\nWind: {wind} m/s\n***Have a good day***')
   except:
-      await message.answer('\U00002620Error! Cheack name city!\U00002620')
+      await message.answer('\U0001F6AB Error! Cheack name city! \U0001F6AB')
 
 
 @dp.message_handler(commands = 'Exit')
@@ -160,9 +179,10 @@ b1 = KeyboardButton('/Get_weather')
 b2 = KeyboardButton('/Choice_my_city')
 b3 = KeyboardButton('/Cheak_into_my_city')
 b4 = KeyboardButton('/Exit')
+b5 = KeyboardButton('/Rename_my_city')
 
 kb.add(b1).add(b2).add(b4)
-kb_reg.add(b1).add(b3).add(b4)
+kb_reg.add(b1).row(b3, b5).add(b4)
 
 
 #start 
