@@ -125,7 +125,7 @@ async def weather(message: types.Message):
         wd = code_to_smile[type_weather]
       else:
         wd = 'Just look into window, i can`t know!'
-      await message.answer(f'***{time_now}***\nSity: {message.text}\nTemp: {temp_sity} C° {wd}\nHumidity: {humidity}\nSunup: {sunup}\nSundown: {sundown}\nWind: {wind} m/s\n***Have a good day***')
+      await message.answer(f'\U0001F55B {time_now} \U0001F55B\nSity: {message.text}\nTemp: {temp_sity} C° {wd}\nHumidity: {humidity}\nSunup: {sunup}\nSundown: {sundown}\nWind: {wind} m/s\n\n\U0001F47E Have a good day \U0001F47E')
     except:
       await message.answer('\U0001F6AB Error! Cheack name city! \U0001F6AB')
 
@@ -144,7 +144,6 @@ async def into_city(message: types.Message):
     'Mist': 'Mist \U0001F32B'
   }
   try:
-      print(city_user[0])
       r = requests.get(f'https://api.openweathermap.org/data/2.5/weather?q={city_user[0]}&appid={API}&units=metric')
       data = r.json()
       type_weather = data['weather'][0]['main']
@@ -158,7 +157,7 @@ async def into_city(message: types.Message):
         wd = code_to_smile[type_weather]
       else:
         wd = 'Just look into window, i can`t know!'
-      await message.answer(f'***{time_now}***\nSity: {city_user[0]}\nTemp: {temp_sity} C° {wd}\nHumidity: {humidity}\nSunup: {sunup}\nSundown: {sundown}\nWind: {wind} m/s\n***Have a good day***')
+      await message.answer(f'\U0001F55B {time_now} \U0001F55B\nSity: {city_user[0]}\nTemp: {temp_sity} C° {wd}\nHumidity: {humidity}\nSunup: {sunup}\nSundown: {sundown}\nWind: {wind} m/s\n\n\U0001F47E Have a good day \U0001F47E')
   except:
       await message.answer('\U0001F6AB Error! Cheack name city! \U0001F6AB')
 
